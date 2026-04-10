@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>好運補給站 - 能量全效照護系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #001529;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, system-ui, sans-serif;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* 竹林背景 */
+        .bamboo-bg {
+            position: fixed;
+            inset: 0;
+            opacity: 0.08;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 200 L30 0 M70 200 L70 0' stroke='%23D4AF37' stroke-width='0.5' fill='none'/%3E%3Cpath d='M30 50 Q45 45 55 55 M70 120 Q55 115 45 125' stroke='%23D4AF37' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(180deg, #001f3f 0%, #001529 100%);
+            border: 2px solid #D4AF37;
+            border-radius: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            margin: 1rem auto;
+            position: relative;
+        }
+
+        .tab-btn {
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            filter: grayscale(0.4);
+        }
+
+        .tab-btn.active {
+            background-color: #D4AF37;
+            color: #001f3f;
+            opacity: 1;
+            filter: grayscale(0);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-animate {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* 香火動畫 */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 8px #ff4d00; opacity: 0.7; }
+            50% { box-shadow: 0 0 20px #ff7700; opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes smoke {
+            0% { transform: translate(-50%, 20px) scaleX(1); opacity: 0; }
+            20% { opacity: 0.2; }
+            100% { transform: translate(-150%, -60px) scaleX(6); opacity: 0; }
+        }
+
+        .incense-tip { animation: glow 2s infinite ease-in-out; }
+        .smoke { animation: smoke 5s infinite linear; }
+
+        /* 圖片視覺優化樣式 */
+        .tab-image {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            margin-top: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: block;
+        }
+
+        .divider {
+            color: rgba(212, 175, 55, 0.3);
+            text-align: center;
+            font-size: 14px;
+            letter-spacing: 0.5em;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-start min-h-screen p-4 text-slate-200">
+
+    <div class="bamboo-bg"></div>
+
+    <div class="card">
+        <!-- 頂部標誌：金色漸層水滴 -->
+        <div class="pt-10 pb-6 text-center bg-black/10">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/40 shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                    <svg width="34" height="34" viewBox="0 0 24 24">
+                        <defs>
+                            <linearGradient id="mainDropGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#F1D592; stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#D4AF37; stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M12 2c0 0-8 6-8 12s4 8 8 8 8-2 8-8-8-12-8-12z" fill="url(#mainDropGradient)"/>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-black tracking-[0.2em] text-[#D4AF37]">好 運 補 給 站</h1>
+            <p class="text-[10px] tracking-[0.4em] text-slate-400 mt-2 opacity-60">福 報 綿 長 · 平 安 吉 祥</p>
+        </div>
+
+        <!-- 4x2 功能選單 -->
+        <div id="grid" class="grid grid-cols-4 gap-2 px-4 py-6 border-b border-[#D4AF37]/20 bg-black/20"></div>
+
+        <!-- 內容區 -->
+        <div id="content" class="p-8 min-h-[500px]"></div>
+
+        <!-- 底部三炷香動畫 -->
+        <div class="pb-12 flex justify-center gap-10 relative border-t border-dashed border-[#D4AF37]/20 mt-4 bg-black/10">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 bg-[#001529] text-[9px] text-[#D4AF37] tracking-[0.3em] font-bold border border-[#D4AF37]/30 rounded-full">蓮花化吉 · 香火傳誠</div>
+            
+            <div class="relative pt-8">
+                <div class="w-1 h-14 bg-gradient-to-b from-[#4a3728] to-[#2a1a0b] rounded-full shadow-md"></div>
+                <div class="absolute top-7 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#ff4d00] rounded-full incense-tip blur-[0.5px]"></div>
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-10 bg-white/10 blur-sm smoke"></div>
+            </div>
+            <div class="relative pt-8">
+                <div class="w-1 h-14 bg-gradient-to-b from-[#4a3728] to-[#2a1a0b] rounded-full shadow-md"></div>
+                <div class="absolute top-7 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#ff4d00] rounded-full incense-tip blur-[0.5px]" style="animation-delay: 0.3s"></div>
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-10 bg-white/10 blur-sm smoke" style="animation-delay: 1.5s"></div>
+            </div>
+            <div class="relative pt-8">
+                <div class="w-1 h-14 bg-gradient-to-b from-[#4a3728] to-[#2a1a0b] rounded-full shadow-md"></div>
+                <div class="absolute top-7 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#ff4d00] rounded-full incense-tip blur-[0.5px]" style="animation-delay: 0.6s"></div>
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-10 bg-white/10 blur-sm smoke" style="animation-delay: 3s"></div>
+            </div>
+        </div>
+
+        <footer class="pb-6 text-center bg-black/20">
+            <p class="text-[8px] tracking-[0.5em] text-[#D4AF37]/30 uppercase font-bold tracking-widest">Luck Station System v9.0</p>
+        </footer>
+    </div>
+
+    <script>
+        // 高品質彩色 SVG 插圖定義
+        const tabIcons = {
+            tab1: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fef08a;"/><stop offset="100%" style="stop-color:#ca8a04;"/></linearGradient></defs><path d="M20 55 C20 40 35 30 50 30 C65 30 80 40 80 55 C80 70 65 80 50 80 C35 80 20 70 20 55" fill="url(#goldGrad)"/><path d="M35 40 C40 25 60 25 65 40" fill="none" stroke="#854d0e" stroke-width="2.5"/></svg>`,
+            tab2: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#fde68a;"/><stop offset="100%" style="stop-color:#d97706;"/></linearGradient></defs><path d="M40 25 C40 20 60 20 60 25 C60 32 40 32 40 25 M50 32 V75 M30 45 L70 45 M40 90 L50 75 L60 90" stroke="url(#paperGrad)" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M45 42 L55 58 M55 42 L45 58" stroke="#991b1b" stroke-width="2" opacity="0.8"/></svg>`,
+            tab3: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><radialGradient id="lotusGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#fbcfe8;"/><stop offset="100%" style="stop-color:#db2777;"/></radialGradient></defs><path d="M50 25 C60 45 50 65 50 65 C50 65 40 45 50 25Z" fill="url(#lotusGrad)"/><path d="M50 45 C75 45 90 70 50 85 C10 70 25 45 50 45Z" fill="url(#lotusGrad)" opacity="0.8"/><path d="M50 85 L35 95 L65 95 Z" fill="#166534"/></svg>`,
+            tab4: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="candleGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#ef4444;"/><stop offset="100%" style="stop-color:#7f1d1d;"/></linearGradient><radialGradient id="flameGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#fef08a;"/><stop offset="100%" style="stop-color:#f59e0b;"/></radialGradient></defs><rect x="42" y="45" width="16" height="35" rx="2" fill="url(#candleGrad)"/><path d="M50 22 L54 30 Q50 35 46 30 Z" fill="url(#flameGrad)"/><path d="M50 45 V35" stroke="#451a03" stroke-width="1.5"/></svg>`,
+            tab5: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="spiritGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#bae6fd;"/><stop offset="100%" style="stop-color:#0ea5e9;"/></linearGradient></defs><circle cx="50" cy="50" r="18" fill="none" stroke="url(#spiritGrad)" stroke-width="3"/><path d="M50 15 V5 M50 95 V85 M15 50 H5 M95 50 H85" stroke="#facc15" stroke-width="3" stroke-linecap="round"/><path d="M30 50 Q50 30 70 50" stroke="#fff" stroke-width="2" fill="none" opacity="0.6"/></svg>`,
+            tab6: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="beastGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#fbbf24;"/><stop offset="100%" style="stop-color:#b91c1c;"/></linearGradient></defs><path d="M30 65 C30 35 70 35 70 65 C70 85 50 90 30 65Z" fill="url(#beastGrad)"/><path d="M35 40 L25 20 M65 40 L75 20" stroke="#fef3c7" stroke-width="3" stroke-linecap="round"/><circle cx="45" cy="55" r="2" fill="#000"/><circle cx="55" cy="55" r="2" fill="#000"/></svg>`,
+            tab7: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="homeGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#38bdf8;"/><stop offset="100%" style="stop-color:#1e40af;"/></linearGradient></defs><path d="M25 45 L50 25 L75 45 V75 H25 Z" fill="url(#homeGrad)"/><circle cx="50" cy="50" r="25" fill="none" stroke="#4ade80" stroke-width="2" stroke-dasharray="5 5" opacity="0.7"/></svg>`,
+            tab8: `<svg viewBox="0 0 100 100" class="w-10 h-10"><defs><linearGradient id="ancestorGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#991b1b;"/><stop offset="100%" style="stop-color:#450a0a;"/></linearGradient></defs><rect x="38" y="25" width="24" height="45" rx="2" fill="url(#ancestorGrad)"/><path d="M44 35 H56 M44 45 H56" stroke="#facc15" stroke-width="1.5" opacity="0.6"/><path d="M30 70 H70" stroke="#ca8a04" stroke-width="4" stroke-linecap="round"/></svg>`
+        };
+
+        const tabs = [
+            { id: 'tab1', label: '補財進庫' }, { id: 'tab2', label: '草人脫身' }, { id: 'tab3', label: '超渡嬰靈' }, { id: 'tab4', label: '七星點燈' },
+            { id: 'tab5', label: '與神對話' }, { id: 'tab6', label: '開光神獸' }, { id: 'tab7', label: '居家能量佈局' }, { id: 'tab8', label: '祖源問題' }
+        ];
+
+        const contentData = {
+            tab1: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《進庫》說明</h2></div>
+                    <p class="leading-relaxed font-light">進庫不只是單純補財庫，而是由神尊依據你目前的整體狀況做調整與提點。</p>
+                    <div class="space-y-2 text-slate-300 font-light">
+                        <p class="font-bold text-[#D4AF37]">內容包含：</p>
+                        <p>1.補自身財庫能量</p>
+                        <p>2.調整個人整體氣場與承財能力</p>
+                    </div>
+                    <div class="bg-[#D4AF37]/10 p-4 rounded-2xl border border-dashed border-[#D4AF37]/40 font-light">
+                        <p class="text-[10px] font-bold text-[#D4AF37] mb-1 uppercase tracking-widest">進階限定</p>
+                        <p class="font-bold text-[#f1d592]">進階版進庫多一項內容</p>
+                        <p class="italic text-sm text-slate-200">「神尊提醒近期需留意的事項」</p>
+                    </div>
+                    <div class="pt-4 space-y-4 font-light text-sm text-slate-300">
+                        <p>有時候補財庫之前，會先看你的身體或運勢狀況。</p>
+                        <div class="bg-red-950/20 p-4 rounded-xl border border-red-900/30">
+                            <p class="text-red-400 font-bold mb-1">例如：</p>
+                            <p>如果健康狀態不穩定，就算補財庫也「接不住財氣」，神尊可能會先協助補健康或穩定自身磁場。</p>
+                        </div>
+                        <p class="text-center font-bold text-[#f1d592]">當整體穩定度提升，財氣自然比較容易進來、也留得住。</p>
+                    </div>
+                    <div class="pt-6 text-center font-bold">
+                        <h3 class="text-[17px] font-black text-white mb-6 whitespace-nowrap overflow-hidden text-ellipsis shadow-sm">進庫的重點不是「突然暴富」</h3>
+                        <div class="space-y-2 max-w-[260px] mx-auto text-sm">
+                            <div class="py-3 bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-xl shadow-lg">財運循序穩定成長</div>
+                            <div class="py-3 bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-xl shadow-lg">判斷力更清晰</div>
+                            <div class="py-3 bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-xl shadow-lg">機會來時接得住</div>
+                        </div>
+                    </div>
+                </div>`,
+            tab2: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《草人脫身》說明</h2></div>
+                    <p class="leading-relaxed font-light">透過草人脫身儀式，由神尊敕令加持，將你近期累積的濁氣、負能量與不順狀況，以「轉嫁草人、焚化金紙」的方式化解送走。</p>
+                    <div class="space-y-3 font-light">
+                        <p class="font-bold text-[#D4AF37]">適合有以下狀況者：</p>
+                        <div class="grid grid-cols-1 gap-1 text-sm border-l border-white/10 pl-3">
+                            <p>1.情緒低落、思緒混亂</p><p>2.卡關、不順、莫名壓力大</p><p>3.車關、卡到陰、犯小人</p><p>4.官司糾紛、人事困擾</p><p>5.身體反覆不適、精神疲憊</p>
+                        </div>
+                    </div>
+                    <div class="bg-[#D4AF37]/5 p-4 rounded-xl border border-[#D4AF37]/20 text-sm font-light leading-relaxed">
+                        透過敕令儀式，把不好的氣場轉化帶走，讓整體磁場回歸穩定。
+                    </div>
+                    <div class="space-y-2">
+                        <p class="font-bold text-[#f1d592] text-sm">完成後常見感受：</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-center">
+                            <div class="py-2 bg-white/5 rounded-lg">思路變清晰</div><div class="py-2 bg-white/5 rounded-lg">情緒穩定度提升</div>
+                            <div class="py-2 bg-white/5 rounded-lg">睡眠改善</div><div class="py-2 bg-white/5 rounded-lg">做事順暢度提升</div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-white/10 text-center font-bold font-black text-white bg-[#D4AF37]/10 py-5 px-2 rounded-3xl border-2 border-[#D4AF37]/30 shadow-lg whitespace-nowrap overflow-hidden">
+                        這是一種「先清理，再重新開始」的轉運方式。
+                    </div>
+                </div>`,
+            tab3: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《嬰靈超渡》說明</h2></div>
+                    <p class="leading-relaxed font-light text-sm">透過神尊代言人，由地藏王菩薩引渡，協助未出世的孩子離開滯留的狀態，回歸輪迴；不是驅離，而是送行；不是消失，而是圓滿。</p>
+                    <div class="space-y-3 font-light">
+                        <p class="font-bold text-[#D4AF37]">未引渡的狀態</p>
+                        <p class="text-xs text-slate-400 italic">不一定會造成絕對性影響，但可能停留在「未完成」有以下狀況：</p>
+                        <div class="grid grid-cols-1 gap-1.5 text-sm border-l border-white/10 pl-3">
+                            <p>1.情緒較易起伏</p><p>2.睡眠不安、易疲憊</p><p>3.運勢感到卡關</p><p>4.身體小狀況不斷</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-white/10 text-center font-bold font-black text-white bg-[#D4AF37]/10 py-5 px-2 rounded-3xl border-2 border-[#D4AF37]/30 shadow-lg whitespace-nowrap overflow-hidden">
+                        引渡，是讓這段緣分，有一個好好說再見的機會。
+                    </div>
+                </div>`,
+            tab4: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《七星點燈》說明</h2></div>
+                    <div class="space-y-4 font-light text-sm leading-relaxed">
+                        <p>透過每日點燈儀式，為個人進行能量穩定與祈福。</p>
+                        <div>
+                            <p class="font-bold text-[#D4AF37] mb-1">可祈請：</p>
+                            <div class="pl-3 border-l border-white/10 space-y-0.5">
+                                <p>守護元辰（穩定運勢與氣場）</p><p>提升事業運與整體發展</p>
+                                <p>保佑身體健康</p><p>化解不順與關卡</p>
+                            </div>
+                        </div>
+                        <p class="bg-white/5 p-4 rounded-xl border border-white/10 italic">由專人每日更換蠟燭，並由神尊代言人進行加持，使能量持續流動、不間斷。</p>
+                        <div>
+                            <p class="font-bold text-[#D4AF37] mb-1">與一般光明燈之差異</p>
+                            <p class="text-xs text-slate-400">本服務採用「每日手工點燈」，非一次性點燈或燈泡形式。每日皆更換蠟燭，並進行加持。流程繁複、耗時費工，但相對能量更為穩定且持續。</p>
+                        </div>
+                    </div>
+                    <div class="space-y-8 mt-6">
+                        <div class="bg-[#D4AF37]/10 p-5 rounded-2xl border border-[#D4AF37]/40 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-[#D4AF37] text-[#001f3f] px-3 py-1 text-[10px] font-black uppercase tracking-widest">效力最強</div>
+                            <p class="font-black text-white mb-2 text-lg text-center">1.七星燈 費用 2600 / 一個月</p>
+                            <p class="text-xs text-slate-300 mb-3 text-center leading-relaxed">由七盞燈組成，能量運作較強，轉換速度較快。</p>
+                            <p class="text-xs text-[#D4AF37] font-bold bg-[#D4AF37]/10 p-2 rounded-lg border border-[#D4AF37]/20 shadow-sm text-center">適合：近期有明確需求，或希望加快運勢調整者。</p>
+                            <img src="seven_star.png" onerror="this.style.display='none'" class="tab-image">
+                        </div>
+                        <div class="bg-white/5 p-5 rounded-2xl border border-white/10 shadow-inner">
+                            <p class="font-black text-white mb-2 text-lg text-center">2.個人燈 費用 600 / 一個月</p>
+                            <p class="text-xs text-slate-300 mb-3 text-center leading-relaxed">單一一盞燈，能量較為溫和，轉換較為循序。</p>
+                            <p class="text-xs text-[#D4AF37] font-bold bg-[#D4AF37]/10 p-2 rounded-lg border border-[#D4AF37]/20 shadow-sm text-center">適合：長期穩定調整、日常持續維護氣場。</p>
+                            <img src="individual_lamp.png" onerror="this.style.display='none'" class="tab-image">
+                        </div>
+                    </div>
+                </div>`,
+            tab5: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《與神對話》</h2></div>
+                    <p class="leading-relaxed font-light text-sm">非坊間起乩方式，與之直接溝通；陪伴我們在心靈層面或把遇到的問題復盤。</p>
+                    <div class="space-y-3 font-light">
+                        <p class="font-bold text-[#D4AF37]">適合有以下狀況者：</p>
+                        <div class="grid grid-cols-1 gap-1 text-sm border-l border-white/10 pl-3">
+                            <p>1.人生卡關、方向不明</p><p>2.感情、事業反覆不順</p><p>3.內心混亂、做不了決定</p><p>4.明明很努力，卻一直不對位</p>
+                        </div>
+                    </div>
+                    <div class="bg-[#D4AF37]/5 p-5 rounded-2xl border border-[#D4AF37]/30 text-sm font-light leading-relaxed">
+                        <p class="text-[#f1d592] font-bold mb-2 text-center underline decoration-gold/30">透過對話與指引的方式，站在客觀第三方的角度看清：</p>
+                        <p class="text-center italic">你現在的狀態、問題的根源以及接下來可以怎麼走的方向。</p>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-white/10 text-center font-bold font-black text-white bg-[#D4AF37]/10 py-5 px-2 rounded-3xl border-2 border-[#D4AF37]/30 shadow-lg whitespace-nowrap overflow-hidden">
+                        不是替你做決定，而是讓你「看懂自己的路」
+                    </div>
+                </div>`,
+            tab6: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《開光神獸》</h2></div>
+                    <div class="space-y-4 font-light text-sm leading-relaxed">
+                        <p>綜觀了傳統民俗故事、陽宅風水以及神尊開光的結合。一直以來三腳金蟾就被視為「有價值的金銀珠寶都咬」的祥瑞獸。</p>
+                        <p class="text-[#f1d592] border-l-2 border-[#D4AF37] pl-3">而經過正神「開光」儀式的金蟾，啟動了招財的屬性，從一般的藝品轉化爲具靈性的守護者。</p>
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/5">
+                            <p class="font-bold text-[#D4AF37] mb-1">請神獸前，會進行以下步驟：</p>
+                            <p>1.由神尊開示 2.核對個人「無形功果簿」 3.確認時機與因緣 4.指示適合神獸種類與方式。</p>
+                            <p class="text-red-400 mt-2 font-bold italic">※ 非每個人、每個時機都適合請</p>
+                        </div>
+                        <div class="bg-[#D4AF37]/10 p-5 rounded-2xl border border-[#D4AF37]/20">
+                            <p class="font-bold text-[#f1d592] mb-1">為什麼需要核對功果簿？</p>
+                            <p>代表一個人當下累積過去、現在的福報累積、因果狀態、財運與運勢承接能力。若未達承接條件，強行請效果有限，能量不對應反而無法發揮作用。</p>
+                        </div>
+                        <p class="text-center italic text-slate-400">必須先請示、了解，再決定是否結緣。</p>
+                        <p class="font-bold text-[#D4AF37]">開光神獸是一種「賦予靈性」的過程：</p>
+                        <div class="pl-3 border-l border-white/10">1.神尊敕令加持 2.啟動靈性 3.建立與主人的連結。</div>
+                        <p class="font-bold text-[#f1d592] text-center border-b border-[#D4AF37]/20 pb-1">神獸功效</p>
+                        <div class="grid grid-cols-1 gap-1 text-[13px] text-slate-300">
+                            <p>1.招財聚財：吸引財氣增加收入流動</p><p>2.咬煞：擋小人、是非、負能量，穩定氣場</p>
+                            <p>3.守護家業 4.協助事業穩扎穩打 5.助生意工作突破預期 6.對投資、非預期收入有正向引導</p>
+                        </div>
+                    </div>
+                </div>`,
+            tab7: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《居家能量佈局》說明</h2></div>
+                    <p class="leading-relaxed font-light text-sm">透過神尊敕令加持後的晶洞、樹化玉、原礦等礦石提升整體性能量，依據空間結構、個人狀況進行整體能量佈局，協助調整環境氣場，提升空間的穩定度與能量流動。</p>
+                    <div class="bg-white/5 p-5 rounded-2xl border border-white/10 shadow-inner">
+                        <p class="text-sm font-light leading-relaxed">本服務著重於<span class="text-[#D4AF37] font-bold">「空間磁場的整理與優化」</span>，讓居住或工作環境回歸平衡與和諧，同時達到擋煞避穢、促進財氣流動、引動五方貴人、提升事業與人際能量之效果。</p>
+                    </div>
+                    <div class="divider">⸻</div>
+                    <div class="space-y-2 text-center text-sm font-light text-slate-300">
+                        <p class="font-bold text-[#D4AF37]">適用空間</p>
+                        <p>1.居家空間（臥室、客廳等）</p><p>2.辦公室／工作場所</p><p>3.店面／營業空間</p>
+                    </div>
+                    <div class="divider">⸻</div>
+                    <p class="text-sm font-light leading-relaxed text-center italic text-slate-300">可依各別需求提供客製化佈局建議與擺設規劃，打造專屬於您的能量場域，讓空間不只是使用，而是能真正「為你運作」。</p>
+                    <div class="divider">⸻</div>
+                    <div class="bg-[#D4AF37]/5 p-5 rounded-2xl border border-[#D4AF37]/20">
+                        <p class="font-bold text-[#f1d592] mb-2">進階佈局建議</p>
+                        <p class="text-sm font-light text-slate-300">亦可搭配「陽宅佈局」服務，結合空間格局（有形）與能量調整（無形）雙向規劃，達到更完整且深層的整體優化效果。</p>
+                        <p class="text-[11px] text-slate-500 mt-4 font-bold">＊陽宅佈局為獨立加值服務，需另行評估與收費。</p>
+                    </div>
+                </div>`,
+            tab8: `
+                <div class="content-animate space-y-6 text-slate-100">
+                    <div class="flex items-center gap-3 border-l-4 border-[#D4AF37] pl-3"><h2 class="text-2xl font-black text-[#D4AF37]">《祖源問題》說明</h2></div>
+                    <div class="space-y-4 text-sm font-light leading-relaxed text-slate-200">
+                        <p class="font-bold text-[#f1d592]">白話來說，就是與祖先有關的問題。</p>
+                        <p>若家族中，如爸爸那一輩以上的長輩中，曾有未婚無子就離世、祖先牌位有拜兩個姓氏等情況，可能會影響後代的整體運勢，包含：</p>
+                        <p class="bg-[#991b1b]/20 p-3 border-l-2 border-red-500 rounded-r-lg italic">事業發展受阻、運途不順、思緒混亂、身體健康、婚姻和合等方面。</p>
+                        <p>是否有祖源問題，會由神尊查看後確認，再透過代言人轉達。若想自己進一步確認，也可向家中長輩詢問、或至戶政事務所調閱祖譜資料作為印證。</p>
+                        <div class="bg-white/5 p-5 rounded-2xl border border-white/10 shadow-inner">
+                            處理祖源需親自前來擲筊請示，經地藏王菩薩聖允後，方可進行後續處理，並由代言人協助引領祖先隨菩薩修行。
+                        </div>
+                        <p>若確認後有意願處理，可由神尊協助引領相關祖先離開原本停滯狀態，走向修行之路，讓家運與個人運勢逐步回歸平順。</p>
+                        <p class="text-xs text-center text-[#D4AF37]/60 font-bold mt-4 italic">若本身信任神尊指示，不再另行印證，也可選擇直接處理。</p>
+                    </div>
+                </div>`,
+            default: `<div class="flex flex-col items-center justify-center h-full py-20 opacity-30 text-center"><div class="text-5xl mb-4">🖋️</div><p class="tracking-[0.5em] text-xs font-bold uppercase">靈力感應中...</p></div>`
+        };
+
+        const grid = document.getElementById('grid');
+        const content = document.getElementById('content');
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(id);
+            if (activeBtn) activeBtn.classList.add('active');
+            content.innerHTML = contentData[id] || contentData.default;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.id = tab.id;
+            btn.className = 'tab-btn flex flex-col items-center justify-center py-4 rounded-2xl border border-[#1e2f4a] bg-[#0a1426]/60 text-[#D4AF37]';
+            btn.innerHTML = `<div class="mb-1 transform scale-90">${tabIcons[tab.id]}</div><span class="text-[9px] font-black tracking-tighter leading-tight">${tab.label}</span>`;
+            btn.onclick = () => switchTab(tab.id);
+            grid.appendChild(btn);
+        });
+
+        // 初始載入第一分頁
+        switchTab('tab1');
+    </script>
+</body>
+</html>
